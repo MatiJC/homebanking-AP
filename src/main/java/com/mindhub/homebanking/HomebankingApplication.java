@@ -1,12 +1,7 @@
 package com.mindhub.homebanking;
 
-import com.mindhub.homebanking.models.Account;
-import com.mindhub.homebanking.models.Client;
-import com.mindhub.homebanking.models.Transaction;
-import com.mindhub.homebanking.models.TransactionType;
-import com.mindhub.homebanking.repositories.AccountRepository;
-import com.mindhub.homebanking.repositories.ClientRepository;
-import com.mindhub.homebanking.repositories.TransactionRepository;
+import com.mindhub.homebanking.models.*;
+import com.mindhub.homebanking.repositories.*;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -14,6 +9,7 @@ import org.springframework.context.annotation.Bean;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.*;
 
 @SpringBootApplication
 public class HomebankingApplication {
@@ -24,19 +20,25 @@ public class HomebankingApplication {
 
 	@Bean
 	public CommandLineRunner initData(ClientRepository clientRepository, AccountRepository accountRepository,
-									  TransactionRepository transactionRepository) {
+									  TransactionRepository transactionRepository, LoanRepository loanRepository,
+									  ClientLoanRepository clientLoanRepository) {
 
 		LocalDate today = LocalDate.now();
 		LocalDateTime now = LocalDateTime.now();
 
 		return (args) -> {
 			Client melba = new Client("Melba", "Morel", "melba@mindhub.com");
+			Client mati = new Client("Mati", "Cuad", "mcuad@mail.com");
 
 			Account melbaAcc1 = new Account("VIN001", today , 5000, melba);
 			Account melbaAcc2 = new Account("VIN002", today.plusDays(1) , 7500, melba);
+			Account matiAcc1 = new Account("MC001", today, 20000, mati);
+			Account matiAcc2 = new Account("MC002", today.plusDays(1) , 15000, mati);
 
 			Transaction order1 = new Transaction(TransactionType.DEBIT, -3000, "Zapatillas", now, melbaAcc1);
 			Transaction order2 = new Transaction(TransactionType.CREDIT, 5000, "Transferencia", now, melbaAcc1);
+			Transaction order3 = new Transaction(TransactionType.DEBIT, -10000, "Supermercado", now, matiAcc1);
+			Transaction order4 = new Transaction(TransactionType.CREDIT, 11000, "Aguinaldo", now, matiAcc2);
 
 
 			clientRepository.save(melba);
@@ -48,6 +50,55 @@ public class HomebankingApplication {
 			melbaAcc1.addTransaction(order2);
 			transactionRepository.save(order1);
 			transactionRepository.save(order2);
+
+			clientRepository.save(mati);
+			mati.addAccount(matiAcc1);
+			mati.addAccount(matiAcc2);
+			accountRepository.save(matiAcc1);
+			accountRepository.save(matiAcc2);
+			matiAcc1.addTransaction(order3);
+			matiAcc2.addTransaction(order4);
+			transactionRepository.save(order3);
+			transactionRepository.save(order4);
+
+
+			List<Integer> mortgagePay = new ArrayList<>() {{
+                add(12);
+                add(24);
+                add(36);
+                add(48);
+                add(60);
+
+            }};
+			List<Integer> personalPay = new ArrayList<>() {{
+                add(6);
+                add(12);
+                add(24);
+            }};
+			List<Integer> automotivePay = new ArrayList<>() {{
+                add(6);
+                add(12);
+                add(24);
+                add(36);
+            }};
+
+			Loan mortgage = new Loan("Mortgage", 500000, mortgagePay);
+			Loan personal = new Loan("Personal", 100000, personalPay);
+			Loan automotive = new Loan("Automotive", 300000, automotivePay);
+
+			loanRepository.save(mortgage);
+			loanRepository.save(personal);
+			loanRepository.save(automotive);
+
+			ClientLoan clientLoan1 = new ClientLoan(400000, 60, melba, mortgage);
+			ClientLoan clientLoan2 = new ClientLoan(50000, 12, melba, personal);
+			ClientLoan clientLoan3 = new ClientLoan(100000, 24, mati, personal);
+			ClientLoan clientLoan4 = new ClientLoan(200000, 36, mati, automotive);
+
+			clientLoanRepository.save(clientLoan1);
+			clientLoanRepository.save(clientLoan2);
+			clientLoanRepository.save(clientLoan3);
+			clientLoanRepository.save(clientLoan4);
 
 		};
 	}
