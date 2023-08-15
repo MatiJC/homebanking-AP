@@ -21,7 +21,7 @@ public class HomebankingApplication {
 	@Bean
 	public CommandLineRunner initData(ClientRepository clientRepository, AccountRepository accountRepository,
 									  TransactionRepository transactionRepository, LoanRepository loanRepository,
-									  ClientLoanRepository clientLoanRepository) {
+									  ClientLoanRepository clientLoanRepository, CardRepository cardRepository) {
 
 		LocalDate today = LocalDate.now();
 		LocalDateTime now = LocalDateTime.now();
@@ -40,6 +40,14 @@ public class HomebankingApplication {
 			Transaction order3 = new Transaction(TransactionType.DEBIT, -10000, "Supermercado", now, matiAcc1);
 			Transaction order4 = new Transaction(TransactionType.CREDIT, 11000, "Aguinaldo", now, matiAcc2);
 
+			Card card1 = new Card(CardType.DEBIT, "2746 3765 9034 3087", (short)156, today, today.plusYears(5),
+					melba.toString(), CardColor.GOLD, melba);
+			Card card2 = new Card(CardType.CREDIT, "0654 3456 7812 7690", (short)943, today, today.plusYears(5),
+					melba.toString(), CardColor.TITANIUM, melba);
+			Card card3 = new Card(CardType.CREDIT, "0237 6591 9357 5410", (short)267, today, today.plusYears(5),
+					mati.toString(), CardColor.SILVER, mati);
+
+
 
 			clientRepository.save(melba);
 			melba.addAccount(melbaAcc1);
@@ -50,6 +58,11 @@ public class HomebankingApplication {
 			melbaAcc1.addTransaction(order2);
 			transactionRepository.save(order1);
 			transactionRepository.save(order2);
+			melba.addCards(card1);
+			melba.addCards(card2);
+			cardRepository.save(card1);
+			cardRepository.save(card2);
+
 
 			clientRepository.save(mati);
 			mati.addAccount(matiAcc1);
@@ -60,6 +73,8 @@ public class HomebankingApplication {
 			matiAcc2.addTransaction(order4);
 			transactionRepository.save(order3);
 			transactionRepository.save(order4);
+			mati.addCards(card3);
+			cardRepository.save(card3);
 
 
 			List<Integer> mortgagePay = new ArrayList<>() {{
