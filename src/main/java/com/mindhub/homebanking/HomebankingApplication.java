@@ -2,10 +2,12 @@ package com.mindhub.homebanking;
 
 import com.mindhub.homebanking.models.*;
 import com.mindhub.homebanking.repositories.*;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -13,6 +15,9 @@ import java.util.*;
 
 @SpringBootApplication
 public class HomebankingApplication {
+
+	@Autowired
+	private PasswordEncoder passwordEncoder;
 
 	public static void main(String[] args) {
 		SpringApplication.run(HomebankingApplication.class, args);
@@ -27,8 +32,16 @@ public class HomebankingApplication {
 		LocalDateTime now = LocalDateTime.now();
 
 		return (args) -> {
-			Client melba = new Client("Melba", "Morel", "melba@mindhub.com");
-			Client mati = new Client("Mati", "Cuad", "mcuad@mail.com");
+			Client melba = new Client("Melba", "Morel", "melba@mindhub.com",
+					passwordEncoder.encode("melmor123"));
+
+			Client mati = new Client("Mati", "Cuad", "mcuad@mail.com",
+					passwordEncoder.encode("maticua123"));
+
+			Client admin = new Client("Admin", "Admin", "admin@mh.com",
+					passwordEncoder.encode("admin123"));
+
+			clientRepository.save(admin);
 
 			Account melbaAcc1 = new Account("VIN001", today , 5000, melba);
 			Account melbaAcc2 = new Account("VIN002", today.plusDays(1) , 7500, melba);
@@ -46,7 +59,6 @@ public class HomebankingApplication {
 					melba.toString(), CardColor.TITANIUM, melba);
 			Card card3 = new Card(CardType.CREDIT, "0237 6591 9357 5410", (short)267, today, today.plusYears(5),
 					mati.toString(), CardColor.SILVER, mati);
-
 
 
 			clientRepository.save(melba);
@@ -114,7 +126,6 @@ public class HomebankingApplication {
 			clientLoanRepository.save(clientLoan2);
 			clientLoanRepository.save(clientLoan3);
 			clientLoanRepository.save(clientLoan4);
-
 		};
 	}
 
