@@ -14,7 +14,7 @@ public class Card {
 
     private CardType cardType;
     private String number;
-    private short securityCode;
+    private short code;
     private LocalDate fromDate;
     private LocalDate thruDate;
 
@@ -31,16 +31,16 @@ public class Card {
     }
 
     public Card(CardType type, String number, short code, LocalDate fromDate, LocalDate thruDate, String owner,
-                CardColor cardColor, Client client) {
+                CardColor cardColor) {
         this.cardType = type;
         this.number = number;
-        this.securityCode = code;
+        this.code = code;
         this.fromDate = fromDate;
         this.thruDate = thruDate;
         this.cardOwner = owner;
         this.cardColor = cardColor;
-        this.client = client;
     }
+
 
     public long getId() {
         return id;
@@ -62,12 +62,12 @@ public class Card {
         this.number = number;
     }
 
-    public short getSecurityCode() {
-        return securityCode;
+    public short getCode() {
+        return code;
     }
 
-    public void setSecurityCode(short securityCode) {
-        this.securityCode = securityCode;
+    public void setCode(short securityCode) {
+        this.code = securityCode;
     }
 
     public LocalDate getFromDate() {
