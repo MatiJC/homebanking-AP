@@ -13,18 +13,26 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
-@EnableWebSecurity
 @Configuration
+@EnableWebSecurity
 class WebAuthorization {
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http.authorizeRequests()
-                .antMatchers("/web/index.html").permitAll()
-                .antMatchers(HttpMethod.POST, "/api/clients", "/api/login", "api/logout").permitAll()
-                .antMatchers("/rest/**").hasAuthority("ADMIN")
-                .antMatchers(HttpMethod.GET, "/api/clients").hasAuthority("CLIENT")
-                .antMatchers(HttpMethod.GET, "/api/accounts").hasAuthority("CLIENT");
+                .antMatchers("/web/index.html", "/web/js/index.js", "/web/css/**", "/web/img/**").permitAll()
+                .antMatchers(HttpMethod.POST, "/api/clients").permitAll()
+                .antMatchers("/api/login", "api/logout").permitAll()
+                .antMatchers("/api/clients/{id}","/api/accounts","/api/accounts/{id}").hasAuthority("CLIENT")
+                .antMatchers("/api/clients/current").hasAuthority("CLIENT")
+                .antMatchers("/rest/**", "/api/**").hasAuthority("ADMIN")
+                .antMatchers("/manager.html", "/manager.js").hasAuthority("ADMIN")
+                .antMatchers("/h2-console").hasAuthority("ADMIN")
+                .antMatchers(HttpMethod.GET, "/api/clients").hasAuthority("ADMIN")
+                .antMatchers(HttpMethod.GET, "/api/accounts").hasAuthority("ADMIN")
+                .antMatchers("/web/**").hasAnyAuthority("CLIENT","ADMIN")
+                .anyRequest().denyAll();
+
 
         http.formLogin()
                 .usernameParameter("email")
