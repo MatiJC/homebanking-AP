@@ -33,32 +33,63 @@ public class HomebankingApplication {
 
 		return (args) -> {
 			Client melba = new Client("Melba", "Morel", "melba@mindhub.com",
-					passwordEncoder.encode("melmor123"));
+					passwordEncoder.encode("melba123"));
 
 			Client mati = new Client("Mati", "Cuad", "mcuad@mail.com",
-					passwordEncoder.encode("maticua123"));
+					passwordEncoder.encode("mati123"));
 
 			Client admin = new Client("Admin", "Admin", "admin@mh.com",
 					passwordEncoder.encode("admin123"));
 
 			clientRepository.save(admin);
 
-			Account melbaAcc1 = new Account("VIN001", today , 5000, melba);
-			Account melbaAcc2 = new Account("VIN002", today.plusDays(1) , 7500, melba);
-			Account matiAcc1 = new Account("MC001", today, 20000, mati);
-			Account matiAcc2 = new Account("MC002", today.plusDays(1) , 15000, mati);
+			Account melbaAcc1 = new Account("VIN-001", today , 5000);
+			Account melbaAcc2 = new Account("VIN-002", today.plusDays(1), 7500);
+			Account matiAcc1 = new Account("VIN-003", today, 20000);
+			Account matiAcc2 = new Account("VIN-004", today.plusDays(1), 15000);
 
-			Transaction order1 = new Transaction(TransactionType.DEBIT, -3000, "Zapatillas", now, melbaAcc1);
-			Transaction order2 = new Transaction(TransactionType.CREDIT, 5000, "Transferencia", now, melbaAcc1);
-			Transaction order3 = new Transaction(TransactionType.DEBIT, -10000, "Supermercado", now, matiAcc1);
-			Transaction order4 = new Transaction(TransactionType.CREDIT, 11000, "Aguinaldo", now, matiAcc2);
+			Transaction order1 = new Transaction(TransactionType.DEBIT, -3000, "Zapatillas", now);
+			Transaction order2 = new Transaction(TransactionType.CREDIT, 5000, "Transferencia", now);
+			Transaction order3 = new Transaction(TransactionType.DEBIT, -10000, "Supermercado", now);
+			Transaction order4 = new Transaction(TransactionType.CREDIT, 11000, "Aguinaldo", now);
 
-			Card card1 = new Card(CardType.DEBIT, "2746 3765 9034 3087", (short)156, today, today.plusYears(5),
-					melba.toString(), CardColor.GOLD, melba);
-			Card card2 = new Card(CardType.CREDIT, "0654 3456 7812 7690", (short)943, today, today.plusYears(5),
-					melba.toString(), CardColor.TITANIUM, melba);
-			Card card3 = new Card(CardType.CREDIT, "0237 6591 9357 5410", (short)267, today, today.plusYears(5),
-					mati.toString(), CardColor.SILVER, mati);
+			Card card1 = new Card(CardType.DEBIT, "2746-3765-9034-3087", (short)156, today, today.plusYears(5),
+					melba.toString(), CardColor.GOLD);
+			Card card2 = new Card(CardType.CREDIT, "0654-3456-7812-7690", (short)943, today, today.plusYears(5),
+					melba.toString(), CardColor.TITANIUM);
+			Card card3 = new Card(CardType.CREDIT, "0237-6591-9357-5410", (short)267, today, today.plusYears(5),
+					mati.toString(), CardColor.SILVER);
+
+
+			List<Integer> mortgagePay = new ArrayList<>() {{
+                add(12);
+                add(24);
+                add(36);
+                add(48);
+                add(60);
+
+            }};
+			List<Integer> personalPay = new ArrayList<>() {{
+                add(6);
+                add(12);
+                add(24);
+            }};
+			List<Integer> automotivePay = new ArrayList<>() {{
+                add(6);
+                add(12);
+                add(24);
+                add(36);
+            }};
+
+			Loan mortgage = new Loan("Mortgage", 500000, mortgagePay);
+			Loan personal = new Loan("Personal", 100000, personalPay);
+			Loan automotive = new Loan("Automotive", 300000, automotivePay);
+
+
+			ClientLoan clientLoan1 = new ClientLoan(400000, 60, melba, mortgage);
+			ClientLoan clientLoan2 = new ClientLoan(50000, 12, melba, personal);
+			ClientLoan clientLoan3 = new ClientLoan(100000, 24, mati, personal);
+			ClientLoan clientLoan4 = new ClientLoan(200000, 36, mati, automotive);
 
 
 			clientRepository.save(melba);
@@ -89,38 +120,10 @@ public class HomebankingApplication {
 			cardRepository.save(card3);
 
 
-			List<Integer> mortgagePay = new ArrayList<>() {{
-                add(12);
-                add(24);
-                add(36);
-                add(48);
-                add(60);
-
-            }};
-			List<Integer> personalPay = new ArrayList<>() {{
-                add(6);
-                add(12);
-                add(24);
-            }};
-			List<Integer> automotivePay = new ArrayList<>() {{
-                add(6);
-                add(12);
-                add(24);
-                add(36);
-            }};
-
-			Loan mortgage = new Loan("Mortgage", 500000, mortgagePay);
-			Loan personal = new Loan("Personal", 100000, personalPay);
-			Loan automotive = new Loan("Automotive", 300000, automotivePay);
-
 			loanRepository.save(mortgage);
 			loanRepository.save(personal);
 			loanRepository.save(automotive);
 
-			ClientLoan clientLoan1 = new ClientLoan(400000, 60, melba, mortgage);
-			ClientLoan clientLoan2 = new ClientLoan(50000, 12, melba, personal);
-			ClientLoan clientLoan3 = new ClientLoan(100000, 24, mati, personal);
-			ClientLoan clientLoan4 = new ClientLoan(200000, 36, mati, automotive);
 
 			clientLoanRepository.save(clientLoan1);
 			clientLoanRepository.save(clientLoan2);

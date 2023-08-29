@@ -1,7 +1,9 @@
 package com.mindhub.homebanking.controllers;
 
 import com.mindhub.homebanking.dto.ClientDTO;
+import com.mindhub.homebanking.models.Account;
 import com.mindhub.homebanking.models.Client;
+import com.mindhub.homebanking.repositories.AccountRepository;
 import com.mindhub.homebanking.repositories.ClientRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.rest.webmvc.ResourceNotFoundException;
@@ -11,7 +13,9 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.util.List;
+import java.util.Random;
 
 import static java.util.stream.Collectors.toList;
 
@@ -23,6 +27,8 @@ public class ClientController {
     private ClientRepository clientRepository;
     @Autowired
     private PasswordEncoder passwordEncoder;
+    @Autowired
+    private AccountRepository accountRepository;
 
     @GetMapping("/clients")
     public List<ClientDTO> getClients() {
@@ -51,16 +57,37 @@ public class ClientController {
                 errorMsg.concat("password");
             }
 
-            return new ResponseEntity<>(errorMsg, HttpStatus.FORBIDDEN);
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(errorMsg);
         }
 
         if (clientRepository.findByEmail(email) !=  null) {
-            return new ResponseEntity<>("Email already in use", HttpStatus.FORBIDDEN);
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Email already in use");
         }
 
-        clientRepository.save(new Client(firstName, lastName, email, passwordEncoder.encode(password)));
+        Client newClient = new Client(firstName, lastName, email, passwordEncoder.encode(password));
 
-        return new ResponseEntity<>(HttpStatus.CREATED);
+        clientRepository.save(newClient);
+
+        Random random = new Random();
+        boolean accountNumberExists;
+        String accountNumber;
+
+        do {
+            int number = random.nextInt(900000) + 100000;
+            accountNumber = "VIN-" + number;
+            String finalAccountNumber = accountNumber;
+            accountNumberExists = clientRepository.findAll().stream()
+                    .anyMatch(client -> client.getAccounts().stream()
+                            .anyMatch(account -> account.getNumber().equals(finalAccountNumber)));
+
+            if (!accountNumberExists) {
+                Account newAccount = new Account(finalAccountNumber, LocalDate.now(), 0.0);
+                newClient.addAccount(newAccount);
+                accountRepository.save(newAccount);
+            }
+        } while (accountNumberExists);
+
+        return ResponseEntity.status(HttpStatus.CREATED).body("Registration successful.");
 
     }
 

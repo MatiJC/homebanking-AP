@@ -10,7 +10,7 @@ public class CardDTO {
     private long id;
     private CardType cardType;
     private String number;
-    private short securityCode;
+    private short code;
     private LocalDate fromDate;
     private LocalDate thruDate;
     private String cardOwner;
@@ -20,7 +20,7 @@ public class CardDTO {
         this.id = card.getId();
         this.cardType = card.getCardType();
         this.number = card.getNumber();
-        this.securityCode = card.getSecurityCode();
+        this.code = card.getCode();
         this.fromDate = card.getFromDate();
         this.thruDate = card.getThruDate();
         this.cardOwner = card.getCardOwner();
@@ -39,8 +39,8 @@ public class CardDTO {
         return number;
     }
 
-    public short getSecurityCode() {
-        return securityCode;
+    public short getCode() {
+        return code;
     }
 
     public LocalDate getFromDate() {
