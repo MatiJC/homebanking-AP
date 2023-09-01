@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import com.mindhub.homebanking.functions.generateNumber;
+import com.mindhub.homebanking.utils.generateNumber;
 
 import java.time.LocalDate;
 import java.util.Random;
@@ -47,17 +47,17 @@ public class CardController {
             if (clientCards.size() >= 3) {
                 return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Clients cannot have more than 3 cards");
             } else {
-                short code;
+                short cvv;
                 String cardNumber;
                 Random random = new Random();
 
                 do {
-                    code = (short) (random.nextInt(900) + 100);
+                    cvv = (short) (random.nextInt(900) + 100);
                     cardNumber = generateNumber.generateCardNumber();
-                } while (cardRepository.existsByCode(code) || cardRepository.existsByNumber(cardNumber));
+                } while (cardRepository.existsByCvv(cvv) || cardRepository.existsByNumber(cardNumber));
 
-                Card newCard = new Card(cardType, cardNumber, code, LocalDate.now(), LocalDate.now().plusYears(5),
-                        authClient.toString(), cardColor);
+                Card newCard = new Card(cardType, cardColor, cardNumber, LocalDate.now(), LocalDate.now().plusYears(5), cvv,
+                        authClient.toString());
                 cardRepository.save(newCard);
 
                 authClient.addCards(newCard);

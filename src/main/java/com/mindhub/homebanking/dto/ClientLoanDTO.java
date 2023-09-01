@@ -4,42 +4,42 @@ import com.mindhub.homebanking.models.ClientLoan;
 
 public class ClientLoanDTO {
 
-    private long id_clientLoan;
-    private long id_loan;
-    private String loanName;
-    private double amountRequested;
-    private int paymentsToMake;
+    private long id;
+    private long loanId;
+    private String name;
+    private double amount;
+    private int payments;
 
     public ClientLoanDTO() {
     }
 
     public ClientLoanDTO(ClientLoan clientLoan) {
-        this.id_clientLoan = clientLoan.getId();
-        this.id_loan = clientLoan.getLoan().getId();
-        this.loanName = clientLoan.getLoan().getName();
-        this.amountRequested = clientLoan.getAmount();
-        this.paymentsToMake = clientLoan.getPayments();
+        this.id = clientLoan.getId();
+        this.loanId = clientLoan.getLoan().getId();
+        this.name = clientLoan.getLoan().getName();
+        this.amount = clientLoan.getAmount();
+        this.payments = clientLoan.getPayments();
     }
 
 
-    public long getId_clientLoan() {
-        return id_clientLoan;
+    public long getId() {
+        return id;
     }
 
-    public long getId_loan() {
-        return id_loan;
+    public long getLoanId() {
+        return loanId;
     }
 
-    public String getLoanName() {
-        return loanName;
+    public String getName() {
+        return name;
     }
 
-    public double getAmountRequested() {
-        return amountRequested;
+    public double getAmount() {
+        return amount;
     }
 
-    public int getPaymentsToMake() {
-        return paymentsToMake;
+    public int getPayments() {
+        return payments;
     }
 
 

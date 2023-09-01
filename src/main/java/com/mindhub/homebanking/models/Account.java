@@ -1,6 +1,5 @@
 package com.mindhub.homebanking.models;
 
-import net.minidev.json.annotate.JsonIgnore;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
@@ -16,7 +15,7 @@ public class Account {
     private long id;
 
     private String number;
-    private LocalDate creationDate;
+    private LocalDate date;
     private double balance;
 
     @ManyToOne(fetch = FetchType.EAGER)
@@ -31,7 +30,7 @@ public class Account {
 
     public Account(String number, LocalDate date, double balance) {
         this.number = number;
-        this.creationDate = date;
+        this.date = date;
         this.balance = balance;
     }
 
@@ -46,12 +45,12 @@ public class Account {
         this.number = number;
     }
 
-    public LocalDate getCreationDate() {
-        return creationDate;
+    public LocalDate getDate() {
+        return date;
     }
 
-    public void setCreationDate(LocalDate creationDate) {
-        this.creationDate = creationDate;
+    public void setDate(LocalDate creationDate) {
+        this.date = creationDate;
     }
 
     public double getBalance() {
