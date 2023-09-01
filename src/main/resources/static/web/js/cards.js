@@ -14,8 +14,12 @@ Vue.createApp({
                 .then((response) => {
                     //get client ifo
                     this.clientInfo = response.data;
+                    console.log(this.clientInfo);
+                    console.log(this.clientInfo.cards);
                     this.creditCards = this.clientInfo.cards.filter(card => card.type == "CREDIT");
+                    console.log(this.creditCards);
                     this.debitCards = this.clientInfo.cards.filter(card => card.type == "DEBIT");
+                    console.log(this.debitCards);
                 })
                 .catch((error) => {
                     this.errorMsg = "Error getting data";

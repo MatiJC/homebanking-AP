@@ -1,5 +1,6 @@
 package com.mindhub.homebanking.controllers;
 
+import com.mindhub.homebanking.dto.CardDTO;
 import com.mindhub.homebanking.models.Card;
 import com.mindhub.homebanking.models.CardColor;
 import com.mindhub.homebanking.models.CardType;
@@ -10,15 +11,16 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import com.mindhub.homebanking.utils.generateNumber;
 
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Random;
 import java.util.Set;
+import java.util.stream.Collectors;
+
+import static java.util.stream.Collectors.toList;
 
 @RestController
 @RequestMapping("/api")
@@ -28,6 +30,26 @@ public class CardController {
     private CardRepository cardRepository;
     @Autowired
     private ClientRepository clientRepository;
+
+    @GetMapping("/clients/current/cards")
+    public ResponseEntity<Object> getCards(Authentication authentication) {
+        Client authClient = clientRepository.findByEmail(authentication.getName());
+
+        if (authClient == null || !authentication.isAuthenticated()) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Login required");
+        }
+
+        List<Card> cards = cardRepository.findByClient(authClient);
+
+        if (cards == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("No cards found");
+        }
+
+        List<CardDTO> cardDTOList = cards.stream().map(card -> new CardDTO(card))
+                .collect(Collectors.toList());
+
+        return ResponseEntity.ok(cardDTOList);
+    }
 
     @PostMapping("/clients/current/cards")
     public ResponseEntity<Object> registerCard(Authentication authentication,
