@@ -27,12 +27,11 @@ class WebAuthorization {
                 .antMatchers("/api/clients/current").hasAuthority("CLIENT")
                 .antMatchers(HttpMethod.POST,"/api/clients/current/accounts").hasAuthority("CLIENT")
                 .antMatchers(HttpMethod.POST,"/api/clients/current/cards").hasAuthority("CLIENT")
-                .antMatchers("/api/clients/current", "/api/clients/current/cards").hasAuthority("CLIENT")
+                .antMatchers(HttpMethod.POST, "/api/transactions").hasAuthority("CLIENT")
+                .antMatchers("/api/clients/current", "/api/clients/current/accounts", "/api/clients/current/cards").hasAuthority("CLIENT")
                 .antMatchers("/rest/**", "/api/**").hasAuthority("ADMIN")
                 .antMatchers("/manager.html", "/manager.js").hasAuthority("ADMIN")
                 .antMatchers("/h2-console").hasAuthority("ADMIN")
-                .antMatchers(HttpMethod.GET, "/api/clients").hasAuthority("ADMIN")
-                .antMatchers(HttpMethod.GET, "/api/accounts").hasAuthority("ADMIN")
                 .antMatchers("/web/**").hasAnyAuthority("CLIENT","ADMIN")
                 .anyRequest().denyAll();
 

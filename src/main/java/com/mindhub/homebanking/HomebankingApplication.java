@@ -48,17 +48,17 @@ public class HomebankingApplication {
 			Account matiAcc1 = new Account("VIN-003", today, 20000);
 			Account matiAcc2 = new Account("VIN-004", today.plusDays(1), 15000);
 
-			Transaction order1 = new Transaction(TransactionType.DEBIT, -3000, "Zapatillas", now);
+			Transaction order1 = new Transaction(TransactionType.DEBIT, 3000, "Zapatillas", now);
 			Transaction order2 = new Transaction(TransactionType.CREDIT, 5000, "Transferencia", now);
-			Transaction order3 = new Transaction(TransactionType.DEBIT, -10000, "Supermercado", now);
+			Transaction order3 = new Transaction(TransactionType.DEBIT, 10000, "Supermercado", now);
 			Transaction order4 = new Transaction(TransactionType.CREDIT, 11000, "Aguinaldo", now);
 
-			Card card1 = new Card(CardType.DEBIT, "2746-3765-9034-3087", (short)156, today, today.plusYears(5),
-					melba.toString(), CardColor.GOLD);
-			Card card2 = new Card(CardType.CREDIT, "0654-3456-7812-7690", (short)943, today, today.plusYears(5),
-					melba.toString(), CardColor.TITANIUM);
-			Card card3 = new Card(CardType.CREDIT, "0237-6591-9357-5410", (short)267, today, today.plusYears(5),
-					mati.toString(), CardColor.SILVER);
+			Card card1 = new Card(CardType.DEBIT, CardColor.GOLD, "2746-3765-9034-3087",  today, today.plusYears(5), (short)156,
+					melba.toString());
+			Card card2 = new Card(CardType.CREDIT, CardColor.TITANIUM, "0654-3456-7812-7690", today, today.plusYears(5), (short)943,
+					melba.toString());
+			Card card3 = new Card(CardType.CREDIT, CardColor.SILVER,"0237-6591-9357-5410",  today, today.plusYears(5), (short)267,
+					mati.toString());
 
 
 			List<Integer> mortgagePay = new ArrayList<>() {{

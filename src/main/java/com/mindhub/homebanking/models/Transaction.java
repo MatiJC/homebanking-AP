@@ -26,7 +26,7 @@ public class Transaction {
 
     public Transaction(TransactionType type, double amount, String description, LocalDateTime date) {
         this.type = type;
-        this.amount = amount;
+        this.amount = (type == TransactionType.CREDIT ? amount : -amount);
         this.description = description;
         this.date = date;
     }

@@ -48,11 +48,11 @@ public class ClientController {
         if (firstName.isEmpty() || lastName.isEmpty() || email.isEmpty() || password.isEmpty()) {
             String errorMsg = "Missing data: ";
             if (firstName.isEmpty()) {
-                errorMsg.concat("firstName ");
+                errorMsg.concat("firstName");
             } else if (lastName.isEmpty()) {
-                errorMsg.concat("lastName ");
+                errorMsg.concat("lastName");
             } else if (email.isEmpty()) {
-                errorMsg.concat("email ");
+                errorMsg.concat("email");
             } else if (password.isEmpty()) {
                 errorMsg.concat("password");
             }

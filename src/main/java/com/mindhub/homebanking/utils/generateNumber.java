@@ -1,4 +1,4 @@
-package com.mindhub.homebanking.functions;
+package com.mindhub.homebanking.utils;
 
 import java.util.Random;
 

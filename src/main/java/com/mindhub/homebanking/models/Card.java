@@ -14,11 +14,11 @@ public class Card {
 
     private CardType cardType;
     private String number;
-    private short code;
+    private short cvv;
     private LocalDate fromDate;
     private LocalDate thruDate;
 
-    private String cardOwner;
+    private String cardHolder;
 
     private CardColor cardColor;
 
@@ -30,15 +30,15 @@ public class Card {
 
     }
 
-    public Card(CardType type, String number, short code, LocalDate fromDate, LocalDate thruDate, String owner,
-                CardColor cardColor) {
+    public Card(CardType type, CardColor cardColor, String number, LocalDate fromDate, LocalDate thruDate, short cvv, String cardHolder
+                ) {
         this.cardType = type;
+        this.cardColor = cardColor;
         this.number = number;
-        this.code = code;
         this.fromDate = fromDate;
         this.thruDate = thruDate;
-        this.cardOwner = owner;
-        this.cardColor = cardColor;
+        this.cvv = cvv;
+        this.cardHolder = cardHolder;
     }
 
 
@@ -62,12 +62,12 @@ public class Card {
         this.number = number;
     }
 
-    public short getCode() {
-        return code;
+    public short getCvv() {
+        return cvv;
     }
 
-    public void setCode(short securityCode) {
-        this.code = securityCode;
+    public void setCvv(short securityCode) {
+        this.cvv = securityCode;
     }
 
     public LocalDate getFromDate() {
@@ -86,12 +86,12 @@ public class Card {
         this.thruDate = thruDate;
     }
 
-    public String getCardOwner() {
-        return cardOwner;
+    public String getCardHolder() {
+        return cardHolder;
     }
 
-    public void setCardOwner(String cardOwner) {
-        this.cardOwner = cardOwner;
+    public void setCardHolder(String cardOwner) {
+        this.cardHolder = cardOwner;
     }
 
     public CardColor getCardColor() {
