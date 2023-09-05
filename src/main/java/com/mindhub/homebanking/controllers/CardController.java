@@ -66,6 +66,10 @@ public class CardController {
         if (authClient != null) {
             Set<Card> clientCards = authClient.getCards();
 
+            if (cardRepository.existsCardByColorAndTypeAndClient(cardColor, cardType, authClient)) {
+                return ResponseEntity.status(HttpStatus.FORBIDDEN).body("You already have a card of the same color and type");
+            }
+
             if (clientCards.size() >= 3) {
                 return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Clients cannot have more than 3 cards");
             } else {

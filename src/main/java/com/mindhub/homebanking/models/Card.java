@@ -12,7 +12,7 @@ public class Card {
     @GenericGenerator(name = "native", strategy = "native")
     private long id;
 
-    private CardType cardType;
+    private CardType type;
     private String number;
     private short cvv;
     private LocalDate fromDate;
@@ -20,7 +20,7 @@ public class Card {
 
     private String cardHolder;
 
-    private CardColor cardColor;
+    private CardColor color;
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "owner_id")
@@ -30,10 +30,10 @@ public class Card {
 
     }
 
-    public Card(CardType type, CardColor cardColor, String number, LocalDate fromDate, LocalDate thruDate, short cvv, String cardHolder
+    public Card(CardType type, CardColor color, String number, LocalDate fromDate, LocalDate thruDate, short cvv, String cardHolder
                 ) {
-        this.cardType = type;
-        this.cardColor = cardColor;
+        this.type = type;
+        this.color = color;
         this.number = number;
         this.fromDate = fromDate;
         this.thruDate = thruDate;
@@ -46,12 +46,12 @@ public class Card {
         return id;
     }
 
-    public CardType getCardType() {
-        return cardType;
+    public CardType getType() {
+        return type;
     }
 
-    public void setCardType(CardType cardType) {
-        this.cardType = cardType;
+    public void setType(CardType cardType) {
+        this.type = cardType;
     }
 
     public String getNumber() {
@@ -94,12 +94,12 @@ public class Card {
         this.cardHolder = cardOwner;
     }
 
-    public CardColor getCardColor() {
-        return cardColor;
+    public CardColor getColor() {
+        return color;
     }
 
-    public void setCardColor(CardColor cardColor) {
-        this.cardColor = cardColor;
+    public void setColor(CardColor cardColor) {
+        this.color = cardColor;
     }
 
     public Client getClient() {
