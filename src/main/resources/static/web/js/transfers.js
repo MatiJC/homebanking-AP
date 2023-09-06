@@ -19,6 +19,7 @@ Vue.createApp({
                 .then((response) => {
                     //get client ifo
                     this.clientAccounts = response.data;
+                    console.log(this.clientAccounts);
                 })
                 .catch((error) => {
                     console.log(error);

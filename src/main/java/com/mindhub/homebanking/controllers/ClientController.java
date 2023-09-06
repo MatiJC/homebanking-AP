@@ -9,13 +9,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
-import java.util.Random;
 
 import static java.util.stream.Collectors.toList;
 
@@ -29,6 +29,8 @@ public class ClientController {
     private PasswordEncoder passwordEncoder;
     @Autowired
     private AccountRepository accountRepository;
+    @Autowired
+    private AccountController accountController;
 
     @GetMapping("/clients")
     public List<ClientDTO> getClients() {
@@ -84,37 +86,26 @@ public class ClientController {
         }
 
         Client newClient = new Client(firstName, lastName, email, passwordEncoder.encode(password));
-
         clientRepository.save(newClient);
 
-        Random random = new Random();
-        boolean accountNumberExists;
-        String accountNumber;
+        String accountNumber = accountController.generateAccountNumber();
 
-        do {
-            int number = random.nextInt(900000) + 100000;
-            accountNumber = "VIN-" + number;
-            String finalAccountNumber = accountNumber;
-            accountNumberExists = clientRepository.findAll().stream()
-                    .anyMatch(client -> client.getAccounts().stream()
-                            .anyMatch(account -> account.getNumber().equals(finalAccountNumber)));
-
-            if (!accountNumberExists) {
-                Account newAccount = new Account(finalAccountNumber, LocalDate.now(), 0.0);
-                newClient.addAccount(newAccount);
-                accountRepository.save(newAccount);
-            }
-        } while (accountNumberExists);
+        Account newAccount = new Account(accountNumber, LocalDate.now(), 0.0);
+        newClient.addAccount(newAccount);
+        accountRepository.save(newAccount);
 
         return ResponseEntity.status(HttpStatus.CREATED).body("Registration successful");
     }
 
     @GetMapping("/clients/current")
     public ResponseEntity<Object> getCurrentClient(Authentication authentication){
-        Client authClient = clientRepository.findByEmail(authentication.getName());
-        if (authClient == null) {
+        boolean isClientAuthenticated = authentication.getAuthorities().stream()
+                .map(GrantedAuthority::getAuthority).anyMatch(authority -> authority.equals("CLIENT"));
+        if (!isClientAuthenticated) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Client not found");
         }
+        Client authClient = clientRepository.findByEmail(authentication.getName());
+
         ClientDTO client = new ClientDTO(authClient);
         return ResponseEntity.ok(client);
     }

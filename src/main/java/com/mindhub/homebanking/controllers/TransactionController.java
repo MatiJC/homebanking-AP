@@ -1,5 +1,6 @@
 package com.mindhub.homebanking.controllers;
 
+import com.mindhub.homebanking.dto.TransactionDTO;
 import com.mindhub.homebanking.models.Account;
 import com.mindhub.homebanking.models.Client;
 import com.mindhub.homebanking.models.Transaction;
@@ -11,13 +12,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
+import java.util.List;
+
+import static java.util.stream.Collectors.toList;
 
 @RestController
 @RequestMapping("/api")
@@ -29,15 +31,28 @@ public class TransactionController {
     @Autowired
     private AccountRepository accountRepository;
 
+    @GetMapping("/transactions")
+    public List<TransactionDTO> getTransactions() {
+        return transactionRepository.findAll().stream().map(transaction -> new TransactionDTO(transaction)).collect(toList());
+    }
+
     @Transactional
     @PostMapping("/transactions")
-    public ResponseEntity createTransaction(@RequestParam long amount,
-                                            @RequestParam String description,
-                                            @RequestParam String fromAccount,
+    public ResponseEntity<Object> createTransaction(@RequestParam String fromAccount,
                                             @RequestParam String toAccount,
+                                            @RequestParam long amount,
+                                            @RequestParam String description,
                                             Authentication authentication) {
 
-        if (amount <= 0 || fromAccount.isEmpty() || toAccount.isEmpty()) {
+        boolean isClientAuthenticated = authentication.getAuthorities().stream()
+                .map(GrantedAuthority::getAuthority).anyMatch(authority -> authority.equals("CLIENT"));
+        if (!isClientAuthenticated) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Login required");
+        }
+
+        Client authClient = clientRepository.findByEmail(authentication.getName());
+
+        if (amount <= 0 || description.isEmpty() || fromAccount.isEmpty() || toAccount.isEmpty() ) {
             String errorMsg = "Missing data: ";
             if (amount <= 0) {
                 errorMsg.concat("Amount cannot be 0 or less");
@@ -64,8 +79,6 @@ public class TransactionController {
         if (fromAccount.equals(toAccount)) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body("The source account cannot be the same as the destination one");
         }
-
-        Client authClient = clientRepository.findByEmail(authentication.getName());
 
         String mailSourceAccountClient = sourceAccount.getClient().getEmail();
         if (!authClient.getEmail().equals(mailSourceAccountClient)) {
