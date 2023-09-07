@@ -100,7 +100,7 @@
                                 <tbody>
                                     <tr v-for="(transaction, index) in accountInfo.transactions"
                                         v-bind:class="[ transaction.type == 'CREDIT' ? 'credit-transaction' : 'debit-transaction' ]">
-                                        <td>{{ index+1 }}</td>
+                                        <td>{{ index }}</td>
                                         <td>{{ transaction.description }}</td>
                                         <td>{{ formatDate(transaction.date) }}</td>
                                         <td>{{ transaction.amount }}</td>

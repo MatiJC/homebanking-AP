@@ -1,24 +1,25 @@
 Vue.createApp({
     data() {
         return {
+            loanTypes: [],
+            loanTypeId: 0,
+            payments: 0,
+            paymentsList: [],
             clientAccounts: [],
-            clientAccountsTo: [],
-            debitCards: [],
             errorToats: null,
             errorMsg: null,
-            accountFromNumber: "VIN",
             accountToNumber: "VIN",
-            trasnferType: "own",
             amount: 0,
-            description: ""
+            fees: []
         }
     },
     methods: {
         getData: function () {
-            axios.get("/api/clients/current/accounts")
+            Promise.all([axios.get("/api/loans"), axios.get("/api/clients/current/accounts")])
                 .then((response) => {
-                    //get client ifo
-                    this.clientAccounts = response.data;
+                    //get loan types ifo
+                    this.loanTypes = response[0].data;
+                    this.clientAccounts = response[1].data;
                 })
                 .catch((error) => {
                     this.errorMsg = "Error getting data";
@@ -28,32 +29,28 @@ Vue.createApp({
         formatDate: function (date) {
             return new Date(date).toLocaleDateString('en-gb');
         },
-        checkTransfer: function () {
-            if (this.accountFromNumber == "VIN") {
-                this.errorMsg = "You must select an origin account";
+        checkApplication: function () {
+            if (this.loanTypeId == 0) {
+                this.errorMsg = "You must select a loan type";
+                this.errorToats.show();
+            }
+            else if (this.payments == 0) {
+                this.errorMsg = "You must select payments";
                 this.errorToats.show();
             }
             else if (this.accountToNumber == "VIN") {
-                this.errorMsg = "You must select a destination account";
-                this.errorToats.show();
-            } else if (this.amount == 0) {
-                this.errorMsg = "You must indicate an amount";
+                this.errorMsg = "You must indicate an account";
                 this.errorToats.show();
             }
-            else if (this.description.length <= 0) {
-                this.errorMsg = "You must indicate a description";
+            else if (this.amount == 0) {
+                this.errorMsg = "You must indicate an amount";
                 this.errorToats.show();
             } else {
                 this.modal.show();
             }
         },
-        transfer: function () {
-            let config = {
-                headers: {
-                    'content-type': 'application/x-www-form-urlencoded'
-                }
-            }
-            axios.post(`/api/transactions?fromAccountNumber=${this.accountFromNumber}&toAccountNumber=${this.accountToNumber}&amount=${this.amount}&description=${this.description}`, config)
+        apply: function () {
+            axios.post("/api/loans", { loanId: this.loanTypeId, amount: this.amount, payments: this.payments, toAccountNumber: this.accountToNumber })
                 .then(response => {
                     this.modal.hide();
                     this.okmodal.show();
@@ -64,17 +61,19 @@ Vue.createApp({
                 })
         },
         changedType: function () {
-            this.accountFromNumber = "VIN";
-            this.accountToNumber = "VIN";
-        },
-        changedFrom: function () {
-            if (this.trasnferType == "own") {
-                this.clientAccountsTo = this.clientAccounts.filter(account => account.number != this.accountFromNumber);
-                this.accountToNumber = "VIN";
-            }
+            this.paymentsList = this.loanTypes.find(loanType => loanType.id == this.loanTypeId).payments;
         },
         finish: function () {
             window.location.reload();
+        },
+        checkFees: function () {
+            this.fees = [];
+            this.totalLoan = parseInt(this.amount) + (this.amount * 0.2);
+            let amount = this.totalLoan / this.payments;
+            for (let i = 1; i <= this.payments; i++) {
+                this.fees.push({ amount: amount });
+            }
+            this.feesmodal.show();
         },
         signOut: function () {
             axios.post('/api/logout')
@@ -89,6 +88,7 @@ Vue.createApp({
         this.errorToats = new bootstrap.Toast(document.getElementById('danger-toast'));
         this.modal = new bootstrap.Modal(document.getElementById('confirModal'));
         this.okmodal = new bootstrap.Modal(document.getElementById('okModal'));
+        this.feesmodal = new bootstrap.Modal(document.getElementById('feesModal'));
         this.getData();
     }
 }).mount('#app')

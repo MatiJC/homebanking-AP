@@ -89,7 +89,7 @@ public class Client {
         return loans;
     }
 
-    public void addClientLoans(ClientLoan clientLoan) {
+    public void addClientLoan(ClientLoan clientLoan) {
         clientLoan.setClient(this);
         loans.add(clientLoan);
     }

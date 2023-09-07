@@ -2,7 +2,6 @@ package com.mindhub.homebanking.dto;
 
 import com.mindhub.homebanking.models.Client;
 
-import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -12,9 +11,9 @@ public class ClientDTO {
     private String firstName;
     private String lastName;
     private String email;
-    private Set<AccountDTO> accounts = new HashSet<>();
-    private Set<ClientLoanDTO> loans = new HashSet<>();
-    private Set<CardDTO> cards = new HashSet<>();
+    private Set<AccountDTO> accounts;
+    private Set<ClientLoanDTO> loans;
+    private Set<CardDTO> cards;
 
     public ClientDTO(Client client) {
         this.id = client.getId();

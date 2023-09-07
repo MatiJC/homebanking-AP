@@ -3,8 +3,8 @@ package com.mindhub.homebanking.controllers;
 import com.mindhub.homebanking.dto.AccountDTO;
 import com.mindhub.homebanking.models.Account;
 import com.mindhub.homebanking.models.Client;
-import com.mindhub.homebanking.repositories.AccountRepository;
-import com.mindhub.homebanking.repositories.ClientRepository;
+import com.mindhub.homebanking.services.AccountService;
+import com.mindhub.homebanking.services.ClientService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -12,25 +12,21 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.LocalDate;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
-
-import static java.util.stream.Collectors.toList;
 
 @RestController
 @RequestMapping("/api")
 public class AccountController {
 
     @Autowired
-    private AccountRepository accountRepository;
+    private AccountService accountService;
     @Autowired
-    private ClientRepository clientRepository;
+    private ClientService clientService;
 
     @GetMapping("/accounts")
     public List<AccountDTO> getAccounts() {
-        return accountRepository.findAll().stream().map(account -> new AccountDTO(account)).collect(toList());
+        return accountService.getAccounts();
     }
 
     @GetMapping("accounts/{id}")
@@ -40,15 +36,13 @@ public class AccountController {
         if (!isClientAuthenticated) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Login required");
         }
-        Client authClient = clientRepository.findByEmail(authentication.getName());
+        Client authClient = clientService.getClientByEmail(authentication.getName());
 
-        Optional<Account> optionalAccount = accountRepository.findById(id);
+        Account account = accountService.getAccountById(id);
 
-        if (!optionalAccount.isPresent()) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("There is no account with that id");
+        if (account == null) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Account not found");
         }
-
-        Account account = optionalAccount.get();
 
         if (account.getClient().equals(authClient)) {
             AccountDTO accountDTO = new AccountDTO(account);
@@ -66,8 +60,8 @@ public class AccountController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Login required");
         }
 
-        Client authClient = clientRepository.findByEmail(authentication.getName());
-        List<Account> accounts = accountRepository.findByClient(authClient);
+        Client authClient = clientService.getClientByEmail(authentication.getName());
+        List<Account> accounts = accountService.getClientAccounts(authClient);
 
         if (accounts == null) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("No accounts found");
@@ -84,29 +78,18 @@ public class AccountController {
         boolean isClientAuthenticated = authentication.getAuthorities().stream()
                 .map(GrantedAuthority::getAuthority).anyMatch(authority -> authority.equals("CLIENT"));
         if (isClientAuthenticated) {
-            Client authClient = clientRepository.findByEmail(authentication.getName());
-            List<Account> accounts = accountRepository.findByClient(authClient);
+            Client authClient = clientService.getClientByEmail(authentication.getName());
+            List<Account> accounts = accountService.getClientAccounts(authClient);
             if (accounts.size() >= 3) {
                 return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Clients cannot have more than 3 accounts");
             } else {
-                String accountNumber = generateAccountNumber();
-                Account account = new Account(accountNumber, LocalDate.now(), 0.0);
+                Account account = accountService.createAccount();
                 authClient.addAccount(account);
-                accountRepository.save(account);
+                accountService.saveAccount(account);
             }
             return ResponseEntity.status(HttpStatus.CREATED).body("Account created successfully");
         } else {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid client");
         }
-    }
-
-    protected String generateAccountNumber() {
-        String accountNumber;
-        do {
-            int number = (int) (Math.random() * 999999);
-            String strNum = String.format("%06d", number);
-            accountNumber = "VIN-" + strNum;
-        } while (accountRepository.existsByNumber(accountNumber));
-        return accountNumber;
     }
 }
