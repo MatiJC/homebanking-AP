@@ -5,19 +5,16 @@ import com.mindhub.homebanking.models.Card;
 import com.mindhub.homebanking.models.CardColor;
 import com.mindhub.homebanking.models.CardType;
 import com.mindhub.homebanking.models.Client;
-import com.mindhub.homebanking.repositories.CardRepository;
-import com.mindhub.homebanking.repositories.ClientRepository;
+import com.mindhub.homebanking.services.CardService;
+import com.mindhub.homebanking.services.ClientService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.web.bind.annotation.*;
-import com.mindhub.homebanking.utils.generateNumber;
 
-import java.time.LocalDate;
 import java.util.List;
-import java.util.Random;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -26,9 +23,9 @@ import java.util.stream.Collectors;
 public class CardController {
 
     @Autowired
-    private CardRepository cardRepository;
+    private CardService cardService;
     @Autowired
-    private ClientRepository clientRepository;
+    private ClientService clientService;
 
     @GetMapping("/clients/current/cards")
     public ResponseEntity<Object> getCards(Authentication authentication) {
@@ -38,8 +35,8 @@ public class CardController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Login required");
         }
 
-        Client authClient = clientRepository.findByEmail(authentication.getName());
-        List<Card> cards = cardRepository.findByClient(authClient);
+        Client authClient = clientService.getClientByEmail(authentication.getName());
+        List<Card> cards = cardService.getClientCards(authClient);
 
         if (cards == null) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("No cards found");
@@ -65,31 +62,28 @@ public class CardController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Card type and color are required");
         }
 
-        Client authClient = clientRepository.findByEmail(authentication.getName());
+        Client authClient = clientService.getClientByEmail(authentication.getName());
 
         Set<Card> clientCards = authClient.getCards();
 
-        if (cardRepository.existsCardByColorAndTypeAndClient(cardColor, cardType, authClient)) {
+        if (cardService.existsCardByColorAndTypeAndClient(cardColor, cardType, authClient)) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body("You already have a card of the same color and type");
         }
 
         if (clientCards.size() >= 3) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Clients cannot have more than 3 cards");
         } else {
-            short cvv;
+            String cvv;
             String cardNumber;
-            Random random = new Random();
-
             do {
-                cvv = (short) (random.nextInt(900) + 100);
-                cardNumber = generateNumber.generateCardNumber();
-            } while (cardRepository.existsByCvv(cvv) || cardRepository.existsByNumber(cardNumber));
+                cvv = cardService.generateCvv();
+                cardNumber = cardService.generateCardNumber();
+            } while (cardService.checkExistance(cardNumber, cvv));
 
-            Card newCard = new Card(cardType, cardColor, cardNumber, LocalDate.now(), LocalDate.now().plusYears(5), cvv,
-                    authClient.toString());
-            cardRepository.save(newCard);
+            Card newCard = cardService.createCard(cardType, cardColor, cardNumber, cvv, authClient.toString());
+            cardService.saveCard(newCard);
             authClient.addCards(newCard);
-            clientRepository.save(authClient);
+            clientService.saveClient(authClient);
 
             return ResponseEntity.status(HttpStatus.CREATED).body("Card successfully created");
         }

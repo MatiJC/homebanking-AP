@@ -13,7 +13,7 @@ import java.util.List;
 public interface CardRepository extends JpaRepository<Card, Long> {
     boolean existsByNumber(String number);
 
-    boolean existsByCvv(short cvv);
+    boolean existsByCvv(String cvv);
 
     List<Card> findByClient(Client client);
 

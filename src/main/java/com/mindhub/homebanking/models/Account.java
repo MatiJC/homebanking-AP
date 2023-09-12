@@ -49,8 +49,8 @@ public class Account {
         return date;
     }
 
-    public void setDate(LocalDate creationDate) {
-        this.date = creationDate;
+    public void setDate(LocalDate date) {
+        this.date = date;
     }
 
     public double getBalance() {

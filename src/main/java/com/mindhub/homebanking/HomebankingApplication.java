@@ -32,7 +32,7 @@ public class HomebankingApplication {
 		LocalDateTime now = LocalDateTime.now();
 
 		return (args) -> {
-			Client melba = new Client("Melba", "Morel", "melba@mindhub.com",
+			/*Client melba = new Client("Melba", "Morel", "melba@mindhub.com",
 					passwordEncoder.encode("melba123"));
 
 			Client mati = new Client("Mati", "Cuad", "mcuad@mail.com",
@@ -53,11 +53,11 @@ public class HomebankingApplication {
 			Transaction order3 = new Transaction(TransactionType.DEBIT, 10000, "Supermercado", now);
 			Transaction order4 = new Transaction(TransactionType.CREDIT, 11000, "Aguinaldo", now);
 
-			Card card1 = new Card(CardType.DEBIT, CardColor.GOLD, "2746-3765-9034-3087",  today, today.plusYears(5), (short)156,
+			Card card1 = new Card(CardType.DEBIT, CardColor.GOLD, "2746-3765-9034-3087",  today, today.plusYears(5), "156",
 					melba.toString());
-			Card card2 = new Card(CardType.CREDIT, CardColor.TITANIUM, "0654-3456-7812-7690", today, today.plusYears(5), (short)943,
+			Card card2 = new Card(CardType.CREDIT, CardColor.TITANIUM, "0654-3456-7812-7690", today, today.plusYears(5), "943",
 					melba.toString());
-			Card card3 = new Card(CardType.CREDIT, CardColor.SILVER,"0237-6591-9357-5410",  today, today.plusYears(5), (short)267,
+			Card card3 = new Card(CardType.CREDIT, CardColor.SILVER,"0237-6591-9357-5410",  today, today.plusYears(5), "267",
 					mati.toString());
 
 
@@ -129,7 +129,8 @@ public class HomebankingApplication {
 			clientLoanRepository.save(clientLoan2);
 			clientLoanRepository.save(clientLoan3);
 			clientLoanRepository.save(clientLoan4);
+		};*/
 		};
 	}
-
 }
+
