@@ -32,7 +32,7 @@ public class HomebankingApplication {
 		LocalDateTime now = LocalDateTime.now();
 
 		return (args) -> {
-			Client melba = new Client("Melba", "Morel", "melba@mindhub.com",
+			/*Client melba = new Client("Melba", "Morel", "melba@mindhub.com",
 					passwordEncoder.encode("melba123"));
 
 			Client mati = new Client("Mati", "Cuad", "mcuad@mail.com",
@@ -129,7 +129,8 @@ public class HomebankingApplication {
 			clientLoanRepository.save(clientLoan2);
 			clientLoanRepository.save(clientLoan3);
 			clientLoanRepository.save(clientLoan4);
+		};*/
 		};
 	}
-
 }
+
